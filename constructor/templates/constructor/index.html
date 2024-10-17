@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Конструктор моделей машинного обучния</title>
+    <link rel="stylesheet" href="{% static 'constructor/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'constructor/css/constructor.css' %}">
+</head>
+<body>
+    <div class="text">
+        <h1>ML-models</h1>
+        <h3>Создайте вашу модель машинного обучения онлайн!</h3>
+    </div>
+    <div class="btn">
+        <p>Перейти в конструктор!</p>
+    </div>
+</body>
+<script>
+    document.querySelector('.btn').addEventListener('click', function () {
+        console.log(1)
+        window.location.href = '{% url 'start' %}'
+    })
+</script>
+
+</html>

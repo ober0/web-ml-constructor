@@ -1,0 +1,42 @@
+body, html {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+#name-section {
+    width: 500px;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid white;
+}
+
+
+
+input[type="button"] {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+input[type='text']{
+    margin-bottom: 15px;
+    text-align: center;
+}
+.error{
+    color: red;
+    font-size: 14px;
+    display: none;
+    text-align: center;
+}
+
+.btn-list{
+    display: flex;
+    gap: 10px
+}
+
+.col{
+    border-radius: 10px;
+    border: 1px solid gray;
+    padding: 10px;
+    margin-bottom: 15px;
+}
