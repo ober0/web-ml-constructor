@@ -113,6 +113,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+DATASET_ROOT_DIR = BASE_DIR / 'constructor/static/datasets'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
