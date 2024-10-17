@@ -67,9 +67,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <input type="text" name="col-name" class="col-name form-control">
             <label for="datatype-select">Тип данных:</label>
             <select name="datatype-select" class="form-select datatype-select">
-                <option value="int">int64</option>
+                <option value="int64">int64</option>
                 <option value="string">string</option>
-                <option value="float">float64</option>
+                <option value="float64">float64</option>
             </select>
             
             <div style="margin-top: 10px" class="predict-val">
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let col_data = {
                 'name': name,
                 'datatype': dt,
-                'predict': selector.checked
+                'predict': selector.checked ? 'True' : 'False'
             }
             DATA.push(col_data)
             index++
@@ -154,9 +154,44 @@ document.addEventListener('DOMContentLoaded', function () {
                 })
                     .then(response => response.json())
                     .then(data => {
+                        console.log(data.messages)
+                        let messages = Object.values(data.messages)
+                        console.log(messages)
+
+                        const parent = document.getElementById('info')
+
+                        messages.forEach(message => {
+                            const time = message['time']
+                            const text = message['text']
+                            const color = message['color']
+                            let new_message = document.createElement('div')
+                            new_message.classList.add('logs-message')
+                            new_message.style.color = color
+                            new_message.innerHTML = `
+                                <p>${time} ${text}</p>
+                            `
+                            parent.appendChild(new_message)
+                        })
                         if (data.success){
-                            alert('succes')
+                            const modelId = data.modelId
+                            let formData = new FormData()
+                            formData.append('modelId', modelId)
+                            fetch('/constructor/model/create/', {
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                                },
+                                body: formData
+                            })
+                                .then(response => response.json())
+                                .then(data => {
+
+                                })
                         }
+                        else {
+                            document.getElementById('wait-section-text').remove()
+                        }
+
                     })
             }
             else {

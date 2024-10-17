@@ -4,7 +4,9 @@ from datetime import datetime
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from .models import UserModels
+from .models import UserModels, DataFields
+from django.db import IntegrityError
+
 def main_page(request):
     return render(request, 'constructor/index.html')
 
@@ -30,9 +32,10 @@ def checkModel(request):
     if request.method == 'POST':
         file = request.FILES['file']
         name = request.POST['name']
-        data = request.POST['data']
-
+        data = json.loads(request.POST['data'])
+        print(type(data), data)
         messages = {}
+
         if file and data and name:
             message = {
                 'text': 'Данные загружены на сервер',
@@ -50,7 +53,7 @@ def checkModel(request):
                 messages[f'message{len(messages)}'] = message
                 return JsonResponse({'success': False, 'messages': messages})
 
-            file_name = f'{datetime.now().strftime("%H-%M-S")}{file.name}'
+            file_name = f'{datetime.now().strftime("%H-%M-%S")}{file.name}'
             path = os.path.join(settings.DATASET_ROOT_DIR, file_name)
 
             with open(path, 'wb+') as f:
@@ -91,10 +94,49 @@ def checkModel(request):
                 messages[f'message{len(messages)}'] = message
                 return JsonResponse({'success': False, 'messages': messages})
 
+            try:
+                for el in data:
+                    print(el)
+                    name = el["name"]
+                    datatype = el["datatype"]
+                    predict = True if el["predict"] == 'True' else False
+
+                    try:
+                        dataField = DataFields(name=name, datetype=datatype, predictValue=predict, modelId=userModel.id)
+                        dataField.save()
+                    except IntegrityError:
+                        message = {
+                            'text': 'Названия столбцов не должны повторяться',
+                            'time': datetime.now().strftime('%H:%M:%S'),
+                            'color': '#ef0000',
+                            'modelId': userModel.id
+                        }
+                        messages[f'message{len(messages)}'] = message
+                        print(messages)
+                        return JsonResponse(
+                            {'success': False, 'messages': messages})
+                message = {
+                    'text': 'Данные стобцов добавлены в базу данных',
+                    'time': datetime.now().strftime('%H:%M:%S'),
+                    'color': '#33ff33',
+                    'modelId': userModel.id
+                }
+                messages[f'message{len(messages)}'] = message
+            except Exception as e:
+                message = {
+                    'text': e,
+                    'time': datetime.now().strftime('%H:%M:%S'),
+                    'color': '#ef0000'
+                }
+                messages[f'message{len(messages)}'] = message
+                if os.path.isfile(path):
+                    os.remove(path)
+                if userModel:
+                    userModel.delete()
+                return JsonResponse({'success': False, 'messages': messages})
 
 
-
-            return JsonResponse({'success': True, 'messages': messages})
+            return JsonResponse({'success': True, 'messages': messages, 'modelId': userModel.id})
 
 
         else:
@@ -105,3 +147,10 @@ def checkModel(request):
             }
             messages[f'message{len(messages)}'] = message
             return JsonResponse({'success': False, 'messages': messages})
+
+
+def createModel(request):
+    if request.method == 'POST':
+        modelId = request.POST['modelId']
+        print(modelId)
+        return JsonResponse({'success': True})

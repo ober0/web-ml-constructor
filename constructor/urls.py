@@ -7,4 +7,6 @@ urlpatterns = [
     path('start/', views.start, name='start'),
     path('start/check/name/', views.checkName),
     path('model/check/', views.checkModel),
+    path('model/create/', views.createModel),
+
 ]
