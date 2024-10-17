@@ -86,10 +86,10 @@ def checkModel(request):
             formatted_columns = {col: dtype for col, dtype in columns_with_types.items()}
 
 
-            print('---------')
-            print(data)
+            data = [{'name': 'Age', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Gender', 'datatype': 'object', 'predict': 'False'}, {'name': 'Weight (kg)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Height (m)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Max_BPM', 'datatype': 'int64', 'predict':
+'False'}, {'name': 'Avg_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Resting_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Session_Duration (hours)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Calories_Burned', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Type', 'datatype': 'object', 'predict': 'False'}, {'name': 'Fat_Percentage', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Water_Intake (liters)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Frequency (days/week)', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Experience_Level', 'datatype': 'int64', 'predict': 'False'}, {'name': 'BMI', 'datatype': 'float64', 'predict': 'True'}]
 
-
+            print(len(data))
             if len(data) == len(columns):
                 for i in data:
 
@@ -114,6 +114,12 @@ def checkModel(request):
                         if os.path.isfile(path):
                             os.remove(path)
                         return JsonResponse({'success': False, 'messages': messages})
+                message = {
+                    'text': f'Все поля успешно проверены и совпали с полями в датасете',
+                    'time': datetime.now().strftime('%H:%M:%S'),
+                    'color': '#33ff33'
+                }
+                messages[f'message{len(messages)}'] = message
             else:
                 message = {
                     'text': f'Количество столбцов не одинаковое',
@@ -156,7 +162,8 @@ def checkModel(request):
                     name = el["name"]
                     datatype = el["datatype"]
                     predict = True if el["predict"] == 'True' else False
-
+                    print(el)
+                    print(name)
                     try:
                         dataField = DataFields(name=name, datetype=datatype, predictValue=predict, modelId=userModel.id)
                         dataField.save()
