@@ -189,10 +189,14 @@ document.addEventListener('DOMContentLoaded', function () {
                             })
                                 .then(response => response.json())
                                 .then(data => {
-
+                                    if (!data.success){
+                                        document.getElementById('stop-req').style.display = 'block'
+                                        document.getElementById('wait-section-text').remove()
+                                    }
                                 })
                         }
                         else {
+                            document.getElementById('stop-req').style.display = 'block'
                             document.getElementById('wait-section-text').remove()
                         }
 
@@ -209,9 +213,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
+    section4.querySelector('.prev').addEventListener('click', function () {
+        hideAllSection(section3)
+    });
+
     section3.querySelector('.prev').addEventListener('click', function () {
         DATA = []
         hideAllSection(section2)
     });
+
+
 
 });
