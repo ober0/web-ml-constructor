@@ -1,13 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
     const section1 = document.getElementById('name-section');
     const section2 = document.getElementById('list-section');
-    const section3 = document.getElementById('predict-section');
-    const section4 = document.getElementById('df-section');
-    const section5 = document.getElementById('wait-section');
+    const section3 = document.getElementById('df-section');
+    const section4 = document.getElementById('wait-section');
 
-    const sections = [section1, section2, section3, section4, section5];
+    const sections = [section1, section2, section3, section4];
 
-    const csrf = document.getElementById('csrf').value
+
+    let DATA = []
+    let NAME = []
+
     function hideAllSection(toOpen){
         sections.forEach(function (el) {
             el.style.display = 'none';
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': csrf
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             },
             body: JSON.stringify({'name': name})
         })
@@ -37,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(data => {
                 if (data.success) {
                     hideAllSection(section2);
+                    NAME = name
                 } else {
                     const errorText = data.error || 'Произошла ошибка';
                     showError(section1, errorText);
@@ -55,6 +58,8 @@ document.addEventListener('DOMContentLoaded', function () {
     section2.querySelector('#value_add').addEventListener('click', function () {
         const parent = section2.querySelector('#columns')
 
+        const currentIndex = parent.children.length;
+
         let child = document.createElement('div')
         child.classList.add('col')
         child.innerHTML = `
@@ -66,6 +71,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 <option value="string">string</option>
                 <option value="float">float64</option>
             </select>
+            
+            <div style="margin-top: 10px" class="predict-val">
+                <input class="form-check-input" type="radio" name="options" id="option-${currentIndex}" value="option-${currentIndex}" checked>
+                <label class="form-check-label" for="option-${currentIndex}">
+                    Предсказывать это значение
+                </label>
+            </div>
+            
             <input style="margin-top: 10px" class="rem btn btn-danger" type="button" value="Удалить">
         `
         child.querySelector('.rem').addEventListener('click', function () {
@@ -77,11 +90,11 @@ document.addEventListener('DOMContentLoaded', function () {
     section2.querySelector('.next').addEventListener('click', function () {
         let columns = section2.querySelectorAll('.col')
         let error;
-        let data = []
         if (columns.length < 2){
             showError(section2, 'Минимум 2 столбца')
             error = true
         }
+        let index = 0
         columns.forEach(col => {
             let name = col.querySelector('.col-name').value
             let dt = col.querySelector('.datatype-select').value
@@ -98,11 +111,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 error = true
                 return false
             }
+
+            let selector = col.querySelector('input[name="options"]')
+
             let col_data = {
                 'name': name,
-                'datatype': dt
+                'datatype': dt,
+                'predict': selector.checked
             }
-            data.push(col_data)
+            DATA.push(col_data)
+            index++
         });
 
         if (!error){
@@ -114,4 +132,46 @@ document.addEventListener('DOMContentLoaded', function () {
     section2.querySelector('.prev').addEventListener('click', function () {
         hideAllSection(section1)
     });
+
+
+
+    section3.querySelector('.next').addEventListener('click', function () {
+        let fileLoad = section3.querySelector('#dataset').files[0]
+        if (fileLoad){
+            if (fileLoad.type === 'text/csv'){
+                hideAllSection(section4)
+                const formData = new FormData();
+                formData.append('file', fileLoad)
+                formData.append('name', NAME)
+                formData.append('data', JSON.stringify(DATA))
+                console.log(NAME, DATA, fileLoad)
+                fetch('/constructor/model/check/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success){
+                            alert('succes')
+                        }
+                    })
+            }
+            else {
+                showError(section3, 'Неверный формат файла')
+            }
+        }
+        else {
+            showError(section3, 'Загрузите датасет')
+        }
+
+
+    });
+
+    section3.querySelector('.prev').addEventListener('click', function () {
+        hideAllSection(section2)
+    });
+
 });

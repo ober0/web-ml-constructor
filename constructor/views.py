@@ -23,3 +23,15 @@ def checkName(request):
             return JsonResponse(
                 {'success': False, 'error': 'Имя модели должно начинаться с буквы'})
         return JsonResponse({'success': True})
+
+def checkModel(request):
+    if request.method == 'POST':
+        file = request.FILES['file']
+        name = request.POST['name']
+        data = request.POST['data']
+
+        if file and data and name:
+
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False})
