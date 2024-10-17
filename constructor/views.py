@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from .models import UserModels, DataFields
 from django.db import IntegrityError
+import pandas as pd
 
 def main_page(request):
     return render(request, 'constructor/index.html')
@@ -73,6 +74,62 @@ def checkModel(request):
                             'color': '#ef0000'
                         }
                         messages[f'message{len(messages)}'] = message
+                        return JsonResponse({'success': False, 'messages': messages})
+
+
+
+
+
+            df = pd.read_csv(path)
+            columns = [i for i in df.columns]
+            columns_with_types = {col: str(df[col].dtype) for col in df.columns}
+            formatted_columns = {col: dtype for col, dtype in columns_with_types.items()}
+
+
+            print('---------')
+            print(data)
+
+
+            if len(data) == len(columns):
+                for i in data:
+
+                    if i['name'] not in columns:
+                        message = {
+                            'text': f'Поле {i["name"]} нет в датафрейме',
+                            'time': datetime.now().strftime('%H:%M:%S'),
+                            'color': '#ef0000'
+                        }
+                        messages[f'message{len(messages)}'] = message
+                        if os.path.isfile(path):
+                            os.remove(path)
+                        return JsonResponse({'success': False, 'messages': messages})
+
+                    if i['datatype'] != formatted_columns.get(i['name'], None):
+                        message = {
+                            'text': f'Поле {i["name"]} имеет неправильный тип данных (ожидался: {formatted_columns.get(i["name"])}, получен: {i["datatype"]})',
+                            'time': datetime.now().strftime('%H:%M:%S'),
+                            'color': '#ef0000'
+                        }
+                        messages[f'message{len(messages)}'] = message
+                        if os.path.isfile(path):
+                            os.remove(path)
+                        return JsonResponse({'success': False, 'messages': messages})
+            else:
+                message = {
+                    'text': f'Количество столбцов не одинаковое',
+                    'time': datetime.now().strftime('%H:%M:%S'),
+                    'color': '#ef0000'
+                }
+                messages[f'message{len(messages)}'] = message
+                if os.path.isfile(path):
+                    os.remove(path)
+                return JsonResponse({'success': False, 'messages': messages})
+
+
+
+
+
+
 
             try:
                 userModel = UserModels(name=name, DatasetPath=file_name)
@@ -96,7 +153,6 @@ def checkModel(request):
 
             try:
                 for el in data:
-                    print(el)
                     name = el["name"]
                     datatype = el["datatype"]
                     predict = True if el["predict"] == 'True' else False
@@ -152,5 +208,6 @@ def checkModel(request):
 def createModel(request):
     if request.method == 'POST':
         modelId = request.POST['modelId']
-        print(modelId)
+
+
         return JsonResponse({'success': True})

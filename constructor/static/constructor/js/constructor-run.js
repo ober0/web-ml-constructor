@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <label for="datatype-select">Тип данных:</label>
             <select name="datatype-select" class="form-select datatype-select">
                 <option value="int64">int64</option>
-                <option value="string">string</option>
+                <option value="object">object</option>
                 <option value="float64">float64</option>
             </select>
             
@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
             error = true
         }
         let index = 0
+        console.log(columns.length)
         columns.forEach(col => {
             let name = col.querySelector('.col-name').value
             let dt = col.querySelector('.datatype-select').value
@@ -106,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 error = true
                 return false
             }
-            if (!/^[a-zA-Z0-9]+$/.test(name)){
+            if (!/^[a-zA-Z0-9\s!@#$%^&*()_,.?":{}\|/<>]+$/.test(name)) {
                 showError(section2, 'Название столбца должно быть из английских букв и цифр')
                 error = true
                 return false
@@ -125,6 +126,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (!error){
             hideAllSection(section3)
+        }
+        else {
+            DATA = []
         }
 
     });
@@ -206,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     section3.querySelector('.prev').addEventListener('click', function () {
+        DATA = []
         hideAllSection(section2)
     });
 
