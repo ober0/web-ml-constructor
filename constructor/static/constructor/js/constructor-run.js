@@ -189,6 +189,29 @@ document.addEventListener('DOMContentLoaded', function () {
                             })
                                 .then(response => response.json())
                                 .then(data => {
+                                    console.log(data)
+                                    let messages = Object.values(data.messages)
+                                    console.log(messages)
+
+                                    const parent = document.getElementById('info')
+
+                                    messages.forEach(message => {
+                                        const time = message['time']
+                                        const text = message['text']
+                                        const color = message['color']
+                                        let new_message = document.createElement('div')
+                                        new_message.classList.add('logs-message')
+                                        new_message.style.color = color
+                                        new_message.innerHTML = `
+                                            <p>${time} ${text}</p>
+                                        `
+                                        parent.appendChild(new_message)
+                                    })
+
+                                    let graph = document.createElement('img')
+                                    graph.classList.add('img-graph')
+                                    graph.src = "static/graphics/2024101895746-Тест.png"
+                                    parent.appendChild(graph)
                                     if (!data.success){
                                         document.getElementById('stop-req').style.display = 'block'
                                         document.getElementById('wait-section-text').remove()
