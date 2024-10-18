@@ -210,7 +210,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                                     let graph = document.createElement('img')
                                     graph.classList.add('img-graph')
-                                    graph.src = "static/graphics/2024101895746-Тест.png"
+                                    graph.src = '/static/graphics/' + data.graphicsPath + ".png"
+                                    console.log('/static/graphics/' + data.graphicsPath + ".png")
                                     parent.appendChild(graph)
                                     if (!data.success){
                                         document.getElementById('stop-req').style.display = 'block'

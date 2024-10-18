@@ -310,4 +310,4 @@ def createModel(request):
             'color': '#33ff33'
         }
         messages[f'message{len(messages)}'] = message
-        return JsonResponse({'success': True, 'messages': messages, 'graphicsPath': graphisPath})
+        return JsonResponse({'success': True, 'messages': messages, 'graphicsPath': filename})
