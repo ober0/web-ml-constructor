@@ -287,6 +287,7 @@ def createModel(request):
         try:
             print(os.path.join(settings.MODELS_ROOT_DIR, modelPath))
             with open(os.path.join(settings.MODELS_ROOT_DIR, modelPath), 'wb') as f:
+
                 pickle.dump(model, f)
             message = {
                 'text': f'Модель успешно сохранена',
@@ -310,4 +311,59 @@ def createModel(request):
             'color': '#33ff33'
         }
         messages[f'message{len(messages)}'] = message
+
+        obj = []
+        df_objects = DataFields.objects.filter(modelId=modelId).all()
+        for df_object in df_objects:
+            if df_object.predictValue != 'True':
+                obj.append(df_object.name)
+
+        data = {}
+        for i in obj:
+            data[i] = 0
+
+        args = ''
+        for key, value in data.items():
+            args += f'{key}={value}&'
+
+        api_address = f'http://127.0.0.1:8000/constructor/api/predict/model/{modelId}?{args}'
+
+        message = {
+            'text': f'api адресс (ОБЯЗАТЕЛЬНО СОХРАНИТЕ ЕГО): {api_address}',
+            'time': datetime.now().strftime('%H:%M:%S'),
+            'color': '#33ff33'
+        }
+        messages[f'message{len(messages)}'] = message
         return JsonResponse({'success': True, 'messages': messages, 'graphicsPath': filename})
+
+
+def predict_api(request, pk):
+    model_id = pk
+    model = UserModels.objects.get(id=model_id)
+    path = os.path.join(settings.MODELS_ROOT_DIR, model.ModelPath)
+
+    obj = []
+    df_objects = DataFields.objects.filter(modelId=model_id).all()
+    for df_object in df_objects:
+        obj.append(df_object.name)
+
+    data = {}
+    for i in obj:
+        data[i] = request.GET.get(i)
+
+    print(data)
+    with open(path, 'rb') as f:
+        model = pickle.load(f)
+        num_cols = model.feature_names_in_
+        for key in data:
+            if key in ['Gender', 'Workout_Type']:
+                data[key] = int(data[key])
+
+        df = pd.DataFrame([data])
+        df = df[num_cols]
+
+        predict = model.predict(df)
+
+    return JsonResponse({'predict': float(predict)}, status=200)
+
+#http://127.0.0.1:8000/constructor/api/predict/model/1?Age=56&Gender=0&Weight%20(kg)=88.3&Height%20(m)=1.71&Max_BPM=180&Resting_BPM=157&Session_Duration%20(hours)=1.69&Calories_Burned=1313.0&Workout_Type=0&Fat_Percentage=12.6&Water_Intake%20(liters)=3.5&Workout_Frequency%20(days/week)=4&Experience_Level=3&Avg_BPM=120

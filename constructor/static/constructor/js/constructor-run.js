@@ -213,9 +213,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                     graph.src = '/static/graphics/' + data.graphicsPath + ".png"
                                     console.log('/static/graphics/' + data.graphicsPath + ".png")
                                     parent.appendChild(graph)
+                                    document.getElementById('wait-section-text').remove()
                                     if (!data.success){
                                         document.getElementById('stop-req').style.display = 'block'
-                                        document.getElementById('wait-section-text').remove()
+                                    }
+                                    else {
+
                                     }
                                 })
                         }
