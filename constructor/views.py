@@ -228,6 +228,9 @@ def createModel(request):
             userModelCfg.ModelPath = filename + '.pkl'
             modelPath = filename + '.pkl'
 
+            userModelCfg.LEPath = filename + '.pkl'
+            lePath = filename + '.pkl'
+
             columns = {}
             userModelColumns = DataFields.objects.filter(modelId=modelId).all()
 
@@ -268,6 +271,7 @@ def createModel(request):
             mse = regressionModel.mse
             model = regressionModel.model
             userModelCfg.mse = mse
+            label_encoders = regressionModel.label_encoders
 
             message = {
                 'text': 'Модель успешно создана',
@@ -283,11 +287,21 @@ def createModel(request):
             }
             messages[f'message{len(messages)}'] = message
             return JsonResponse({'success': False, 'messages': messages})
-        print(4)
-        try:
-            print(os.path.join(settings.MODELS_ROOT_DIR, modelPath))
-            with open(os.path.join(settings.MODELS_ROOT_DIR, modelPath), 'wb') as f:
 
+        try:
+            try:
+                with open(os.path.join(settings.LE_ROOT_DIR, lePath), 'wb') as f:
+                    pickle.dump(label_encoders, f)
+
+            except Exception as e:
+                message = {
+                    'text': f'Ошибка сохранения модели: {str(e)}',
+                    'time': datetime.now().strftime('%H:%M:%S'),
+                    'color': '#ef0000'
+                }
+                messages[f'message{len(messages)}'] = message
+                return JsonResponse({'success': False, 'messages': messages})
+            with open(os.path.join(settings.MODELS_ROOT_DIR, modelPath), 'wb') as f:
                 pickle.dump(model, f)
             message = {
                 'text': f'Модель успешно сохранена',
@@ -326,7 +340,7 @@ def createModel(request):
         for key, value in data.items():
             args += f'{key}={value}&'
 
-        api_address = f'http://127.0.0.1:8000/constructor/api/predict/model/{modelId}?{args}'
+        api_address = f'http://127.0.0.1:8000/view/api/predict/model/{modelId}?{args}'
 
         message = {
             'text': f'api адресс (ОБЯЗАТЕЛЬНО СОХРАНИТЕ ЕГО): {api_address}',
@@ -344,33 +358,3 @@ def createModel(request):
         return JsonResponse({'success': True, 'messages': messages, 'graphicsPath': filename})
 
 
-def predict_api(request, pk):
-    model_id = pk
-    model = UserModels.objects.get(id=model_id)
-    path = os.path.join(settings.MODELS_ROOT_DIR, model.ModelPath)
-
-    obj = []
-    df_objects = DataFields.objects.filter(modelId=model_id).all()
-    for df_object in df_objects:
-        obj.append(df_object.name)
-
-    data = {}
-    for i in obj:
-        data[i] = request.GET.get(i)
-
-    print(data)
-    with open(path, 'rb') as f:
-        model = pickle.load(f)
-        num_cols = model.feature_names_in_
-        for key in data:
-            if key in ['Gender', 'Workout_Type']:
-                data[key] = int(data[key])
-
-        df = pd.DataFrame([data])
-        df = df[num_cols]
-
-        predict = model.predict(df)
-
-    return JsonResponse({'predict': float(predict)}, status=200)
-
-#http://127.0.0.1:8000/constructor/api/predict/model/1?Age=56&Gender=0&Weight%20(kg)=88.3&Height%20(m)=1.71&Max_BPM=180&Resting_BPM=157&Session_Duration%20(hours)=1.69&Calories_Burned=1313.0&Workout_Type=0&Fat_Percentage=12.6&Water_Intake%20(liters)=3.5&Workout_Frequency%20(days/week)=4&Experience_Level=3&Avg_BPM=120

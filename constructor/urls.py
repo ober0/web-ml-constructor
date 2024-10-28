@@ -8,6 +8,4 @@ urlpatterns = [
     path('start/check/name/', views.checkName),
     path('model/check/', views.checkModel),
     path('model/create/', views.createModel),
-    path('api/predict/model/<int:pk>', views.predict_api),
-
 ]

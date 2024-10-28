@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'constructor',
+    'view'
 ]
 
 MIDDLEWARE = [
@@ -116,6 +117,7 @@ USE_TZ = True
 DATASET_ROOT_DIR = BASE_DIR / 'constructor/static/datasets'
 GRAPHICS_ROOT_DIR = BASE_DIR / 'constructor/static/graphics'
 MODELS_ROOT_DIR = BASE_DIR / 'constructor/static/models'
+LE_ROOT_DIR = BASE_DIR / 'constructor/static/label_encoders'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

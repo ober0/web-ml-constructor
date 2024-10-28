@@ -19,14 +19,12 @@ class LinearRegreesionModel:
         self.nameroot = graphisPath
         self.df = self.read()
 
-        self.le = self.labelEncode(columns)
+        self.label_encoders = self.labelEncode(columns)
 
         self.mse, self.model = self.learn()
 
     def read(self):
-        print(self.path)
         df = pd.read_csv(self.path)
-        print(df)
         df.drop_duplicates(inplace=True)
 
         for col in df.columns:
@@ -40,14 +38,19 @@ class LinearRegreesionModel:
         return df
 
     def labelEncode(self, columns):
-        le = LabelEncoder()
-        for name, datatype in columns.items():
-            if datatype == 'object':
-                self.df[name] = le.fit_transform(self.df[name])
-        return le
+        label_encoders = {}
+        names = [name for name, datatype in columns.items() if datatype == 'object']
+
+        for name in names:
+            le = LabelEncoder()
+            self.df[name] = le.fit_transform(self.df[name].fillna("unknown"))
+            label_encoders[name] = le
+
+        return label_encoders
 
     def learn(self):
         X = self.df[self.num_col].drop(self.find, axis=1)
+        print(self.find)
         y = self.df[self.find]
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 

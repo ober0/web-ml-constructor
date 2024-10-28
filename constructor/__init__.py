@@ -9,3 +9,6 @@ path.mkdir(exist_ok=True)
 
 path = pathlib.Path(os.path.join(pathlib.Path(__file__).parent.absolute(), 'static/models'))
 path.mkdir(exist_ok=True)
+
+path = pathlib.Path(os.path.join(pathlib.Path(__file__).parent.absolute(), 'static/label_encoders'))
+path.mkdir(exist_ok=True)
