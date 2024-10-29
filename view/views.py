@@ -1,3 +1,4 @@
+import requests
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
@@ -47,9 +48,9 @@ def request_predict(request, pk):
         model_name = model.name
 
         fields = {}
+        find = None
         for field in fields_db:
             le_fields = None
-            find = None
             if field.predictValue == 'False':
                 if field.datetype.lower() == 'object' and model.LEPath:
                     lePath = os.path.join(settings.LE_ROOT_DIR, model.LEPath)
@@ -75,8 +76,19 @@ def request_predict(request, pk):
         return render(request, 'view/index.html', {'fields': fields, 'model_name': model_name, 'find': find})
 
     elif request.method == "POST":
-        print(request.POST)
-        return JsonResponse({})
+        data = dict(request.POST)
+        del data['csrfmiddlewaretoken']
+
+        url = f'{settings.HOST_NAME}/view/api/predict/model/{pk}/?'
+        for key, value in data.items():
+            url += f'{key}={value[0]}&'
+
+        response = requests.get(url)
+        print(response.status_code)
+        print(url)
+        data = response.json()
+        predict = data['predict']
+        return render(request, 'view/result.html', {'predict': predict})
 
 
 #http://127.0.0.1:8000/view/api/predict/model/1?Age=56&Gender=0&Weight%20(kg)=88.3&Height%20(m)=1.71&Max_BPM=180&Resting_BPM=157&Session_Duration%20(hours)=1.69&Calories_Burned=1313.0&Workout_Type=0&Fat_Percentage=12.6&Water_Intake%20(liters)=3.5&Workout_Frequency%20(days/week)=4&Experience_Level=3&Avg_BPM=120

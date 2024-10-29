@@ -27,7 +27,7 @@
                         </select>
                     {% else %}
                         <label for="{{ field_name }}">{{ field_name }}</label>
-                        <input type="number" name="{{ field_name }}" placeholder="{{ field_data.datetype }}" class="form-control">
+                        <input step="0.001" type="number" name="{{ field_name }}" placeholder="{{ field_data.datetype }}" class="form-control">
                     {% endif %}
                 </div>
             {% endfor %}

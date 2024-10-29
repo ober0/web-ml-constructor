@@ -88,8 +88,8 @@ def checkModel(request):
             formatted_columns = {col: dtype for col, dtype in columns_with_types.items()}
 
 
-            data = [{'name': 'Age', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Gender', 'datatype': 'object', 'predict': 'False'}, {'name': 'Weight (kg)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Height (m)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Max_BPM', 'datatype': 'int64', 'predict':
-'False'}, {'name': 'Avg_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Resting_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Session_Duration (hours)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Calories_Burned', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Type', 'datatype': 'object', 'predict': 'False'}, {'name': 'Fat_Percentage', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Water_Intake (liters)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Frequency (days/week)', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Experience_Level', 'datatype': 'int64', 'predict': 'False'}, {'name': 'BMI', 'datatype': 'float64', 'predict': 'True'}]
+            # data = [{'name': 'Age', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Gender', 'datatype': 'object', 'predict': 'False'}, {'name': 'Weight (kg)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Height (m)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Max_BPM', 'datatype': 'int64', 'predict':
+# 'False'}, {'name': 'Avg_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Resting_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Session_Duration (hours)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Calories_Burned', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Type', 'datatype': 'object', 'predict': 'False'}, {'name': 'Fat_Percentage', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Water_Intake (liters)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Frequency (days/week)', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Experience_Level', 'datatype': 'int64', 'predict': 'False'}, {'name': 'BMI', 'datatype': 'float64', 'predict': 'True'}]
 
 
             if len(data) == len(columns):
@@ -215,7 +215,6 @@ def createModel(request):
     if request.method == 'POST':
         messages = {}
         modelId = request.POST['modelId']
-        print(1)
         try:
             userModelCfg = UserModels.objects.get(id=modelId)
             datasetPath = os.path.join(settings.DATASET_ROOT_DIR, userModelCfg.DatasetPath)
@@ -348,6 +347,16 @@ def createModel(request):
             'color': '#33ff33'
         }
         messages[f'message{len(messages)}'] = message
+
+        site_address = f'http://127.0.0.1:8000/view/model/{modelId}/request/'
+
+        message = {
+            'text': f'Ссылка на визуальный интерфейс: {site_address}',
+            'time': datetime.now().strftime('%H:%M:%S'),
+            'color': '#33ff33'
+        }
+        messages[f'message{len(messages)}'] = message
+
 
         try:
             userModelCfg.api = api_address
