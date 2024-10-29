@@ -41,18 +41,42 @@ def predict_api(request, pk):
 
 
 def request_predict(request, pk):
-    model_id = pk
-    model_db = UserModels.objects.get(id=model_id)
+    if request.method == "GET":
+        fields_db = DataFields.objects.filter(modelId=pk).all()
+        model = UserModels.objects.get(id=pk)
+        model_name = model.name
 
-    path = os.path.join(settings.MODELS_ROOT_DIR, model_db.ModelPath)
+        fields = {}
+        for field in fields_db:
+            le_fields = None
+            find = None
+            if field.predictValue == 'False':
+                if field.datetype.lower() == 'object' and model.LEPath:
+                    lePath = os.path.join(settings.LE_ROOT_DIR, model.LEPath)
 
-    with open(path, 'rb') as f:
-        model = pickle.load(f)
-        num_cols = model.feature_names_in_
+                    if os.path.exists(lePath) and os.path.getsize(lePath) > 0:
+                        try:
+                            with open(lePath, 'rb') as f:
+                                label_encoders = pickle.load(f)
+                                le = label_encoders.get(field.name)
+                                if le:
+                                    le_fields = list(le.classes_)
+                        except (EOFError, pickle.UnpicklingError):
+                            return JsonResponse({"error": "Ошибка загрузки данных: файл поврежден или пуст"},
+                                                status=400)
 
-    return JsonResponse({})
+                fields[field.name] = {
+                    'datetype': field.datetype,
+                    'le_fields': le_fields
+                }
+            else:
+                find = field.name
+
+        return render(request, 'view/index.html', {'fields': fields, 'model_name': model_name, 'find': find})
+
+    elif request.method == "POST":
+        print(request.POST)
+        return JsonResponse({})
 
 
-
-
-#http://127.0.0.1:8000/constructor/api/predict/model/1?Age=56&Gender=0&Weight%20(kg)=88.3&Height%20(m)=1.71&Max_BPM=180&Resting_BPM=157&Session_Duration%20(hours)=1.69&Calories_Burned=1313.0&Workout_Type=0&Fat_Percentage=12.6&Water_Intake%20(liters)=3.5&Workout_Frequency%20(days/week)=4&Experience_Level=3&Avg_BPM=120
+#http://127.0.0.1:8000/view/api/predict/model/1?Age=56&Gender=0&Weight%20(kg)=88.3&Height%20(m)=1.71&Max_BPM=180&Resting_BPM=157&Session_Duration%20(hours)=1.69&Calories_Burned=1313.0&Workout_Type=0&Fat_Percentage=12.6&Water_Intake%20(liters)=3.5&Workout_Frequency%20(days/week)=4&Experience_Level=3&Avg_BPM=120
