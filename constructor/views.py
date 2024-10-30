@@ -292,6 +292,9 @@ def createModel(request):
                 'color': '#ef0000'
             }
             messages[f'message{len(messages)}'] = message
+            user_model = UserModels.objects.get(id=modelId)
+            user_model.delete()
+
             return JsonResponse({'success': False, 'messages': messages})
         print(2)
         if find == '':
@@ -301,7 +304,8 @@ def createModel(request):
                 'color': '#ef0000'
             }
             messages[f'message{len(messages)}'] = message
-            print('error3')
+            user_model = UserModels.objects.get(id=modelId)
+            user_model.delete()
             return JsonResponse({'success': False, 'messages': messages})
         print(3)
         try:
@@ -313,7 +317,7 @@ def createModel(request):
             elif model_type == 'gradient-booster-model':
                 regressionModel = GradientBoosterModel(datasetPath, find, columns, graphisPath, save_png=True)
             elif model_type == 'svr-model':
-                regressionModel = SvrModel(datasetPath, find, columns, graphisPath, save_png=False)
+                regressionModel = SvrModel(datasetPath, find, columns, graphisPath, save_png=True)
             elif model_type == 'decision-tree-model':
                 regressionModel = DecisionTreeModel(datasetPath, find, columns, graphisPath, save_png=True)
             elif model_type == 'optimal':
@@ -348,6 +352,8 @@ def createModel(request):
                 'time': datetime.now().strftime('%H:%M:%S'),
                 'color': '#ef0000'
             }
+            user_model = UserModels.objects.get(id=modelId)
+            user_model.delete()
             messages[f'message{len(messages)}'] = message
             return JsonResponse({'success': False, 'messages': messages})
 
@@ -362,6 +368,8 @@ def createModel(request):
                     'time': datetime.now().strftime('%H:%M:%S'),
                     'color': '#ef0000'
                 }
+                user_model = UserModels.objects.get(id=modelId)
+                user_model.delete()
                 messages[f'message{len(messages)}'] = message
                 return JsonResponse({'success': False, 'messages': messages})
             with open(os.path.join(settings.MODELS_ROOT_DIR, modelPath), 'wb') as f:
@@ -378,6 +386,8 @@ def createModel(request):
                 'time': datetime.now().strftime('%H:%M:%S'),
                 'color': '#ef0000'
             }
+            user_model = UserModels.objects.get(id=modelId)
+            user_model.delete()
             messages[f'message{len(messages)}'] = message
             print(f"Error saving model: {e}")
             return JsonResponse({'success': False, 'messages': messages})

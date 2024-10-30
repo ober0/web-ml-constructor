@@ -73,7 +73,7 @@ def request_predict(request, pk):
             else:
                 find = field.name
 
-        return render(request, 'view/index.html', {'fields': fields, 'model_name': model_name, 'find': find})
+        return render(request, 'view/index.html', {'fields': fields, 'model_name': model_name, 'find': find, 'model_type': model.model_type})
 
     elif request.method == "POST":
         data = dict(request.POST)
