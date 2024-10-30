@@ -8,6 +8,7 @@ class UserModels(models.Model):
     ModelPath = models.CharField(max_length=200, null=True, blank=True, unique=True)
     mse = models.FloatField(max_length=30, null=True, blank=False)
     api = models.TextField(null=True, blank=True)
+    model_type = models.CharField(max_length=40, null=True, blank=True, unique=False, default='linear-regression-model')
 
 class DataFields(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)

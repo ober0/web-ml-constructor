@@ -14,8 +14,9 @@ from sklearn.tree import DecisionTreeRegressor
 
 
 class RegressionModel:
-    def __init__(self, datasetPath, find, columns, graphisPath):
+    def __init__(self, datasetPath, find, columns, graphisPath, save_png):
         self.path = datasetPath
+        self.save_png = save_png
         self.find = find
         self.num_col = columns.keys()
         self.num_col_without_find = [i for i in self.num_col if i != self.find]
@@ -66,8 +67,8 @@ class RegressionModel:
         # Убедитесь, что директория для графиков существует
         if not os.path.exists(settings.GRAPHICS_ROOT_DIR):
             os.makedirs(settings.GRAPHICS_ROOT_DIR)
-
-        plt.savefig(os.path.join(settings.GRAPHICS_ROOT_DIR, self.nameroot))
+        if self.save_png == True:
+            plt.savefig(os.path.join(settings.GRAPHICS_ROOT_DIR, self.nameroot))
         plt.close()
 
         mse = mean_squared_error(y_test, y_pred)
@@ -75,33 +76,33 @@ class RegressionModel:
 
 
 class LinearRegressionModel(RegressionModel):
-    def __init__(self, datasetPath, find, columns, graphisPath):
-        super().__init__(datasetPath, find, columns, graphisPath)
+    def __init__(self, datasetPath, find, columns, graphisPath, save_png):
+        super().__init__(datasetPath, find, columns, graphisPath, save_png)
         self.model = LinearRegression(fit_intercept=True)
         self.mse = self.learn()
 
 
 class RandomForestModel(RegressionModel):
-    def __init__(self, datasetPath, find, columns, graphisPath):
-        super().__init__(datasetPath, find, columns, graphisPath)
+    def __init__(self, datasetPath, find, columns, graphisPath, save_png):
+        super().__init__(datasetPath, find, columns, graphisPath, save_png)
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
         self.mse = self.learn()
 
 class GradientBoosterModel(RegressionModel):
-    def __init__(self, datasetPath, find, columns, graphisPath):
-        super().__init__(datasetPath, find, columns, graphisPath)
+    def __init__(self, datasetPath, find, columns, graphisPath, save_png):
+        super().__init__(datasetPath, find, columns, graphisPath, save_png)
         self.model = GradientBoostingRegressor(n_estimators=100, random_state=42)
         self.mse = self.learn()
 
 class SvrModel(RegressionModel):
-    def __init__(self, datasetPath, find, columns, graphisPath):
-        super().__init__(datasetPath, find, columns, graphisPath)
+    def __init__(self, datasetPath, find, columns, graphisPath, save_png):
+        super().__init__(datasetPath, find, columns, graphisPath, save_png)
         self.model = SVR(kernel='rbf', C=100, epsilon=0.1)
         self.mse = self.learn()
 
 class DecisionTreeModel(RegressionModel):
-    def __init__(self, datasetPath, find, columns, graphisPath):
-        super().__init__(datasetPath, find, columns, graphisPath)
+    def __init__(self, datasetPath, find, columns, graphisPath, save_png):
+        super().__init__(datasetPath, find, columns, graphisPath, save_png)
         self.model = DecisionTreeRegressor(random_state=42)
         self.mse = self.learn()
 

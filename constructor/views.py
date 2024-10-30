@@ -11,6 +11,9 @@ from .createMLModel import LinearRegressionModel, RandomForestModel, GradientBoo
 import pickle
 
 
+class InvalidModelTypeError(Exception):
+    pass
+
 def main_page(request):
     return render(request, 'constructor/index.html')
 
@@ -211,10 +214,46 @@ def checkModel(request):
             return JsonResponse({'success': False, 'messages': messages})
 
 
+def choiceOptimalModel(datasetPath, find, columns, graphisPath):
+    model1 = LinearRegressionModel(datasetPath, find, columns, graphisPath, save_png=False)
+    model2 = RandomForestModel(datasetPath, find, columns, graphisPath, save_png=False)
+    model3 = GradientBoosterModel(datasetPath, find, columns, graphisPath, save_png=False)
+    model4 = SvrModel(datasetPath, find, columns, graphisPath, save_png=False)
+    model5 = DecisionTreeModel(datasetPath, find, columns, graphisPath, save_png=False)
+
+    models_mse = {
+        'linear-regression-model': model1.mse,
+        'random-forest-model': model2.mse,
+        'gradient-booster-model': model3.mse,
+        'svr-model': model4.mse,
+        'decision-tree-model': model5.mse
+    }
+
+    optimal_type = min(models_mse, key=models_mse.get)
+
+    if optimal_type == 'linear-regression-model':
+        regressionModel = LinearRegressionModel(datasetPath, find, columns, graphisPath, save_png=True)
+    elif optimal_type == 'random-forest-model':
+        regressionModel = RandomForestModel(datasetPath, find, columns, graphisPath, save_png=True)
+    elif optimal_type == 'gradient-booster-model':
+        regressionModel = GradientBoosterModel(datasetPath, find, columns, graphisPath, save_png=True)
+    elif optimal_type == 'svr-model':
+        regressionModel = SvrModel(datasetPath, find, columns, graphisPath, save_png=True)
+    elif optimal_type == 'decision-tree-model':
+        regressionModel = DecisionTreeModel(datasetPath, find, columns, graphisPath, save_png=True)
+    else:
+        regressionModel = None
+
+    return regressionModel, optimal_type
+
+
+
 def createModel(request):
     if request.method == 'POST':
         messages = {}
+        print(request.POST)
         modelId = request.POST['modelId']
+        model_type = request.POST['model-type']
         try:
             userModelCfg = UserModels.objects.get(id=modelId)
             datasetPath = os.path.join(settings.DATASET_ROOT_DIR, userModelCfg.DatasetPath)
@@ -267,11 +306,29 @@ def createModel(request):
         print(3)
         try:
             #Регрессии
-            # regressionModel = LinearRegressionModel(datasetPath, find, columns, graphisPath)
-            # regressionModel = RandomForestModel(datasetPath, find, columns, graphisPath)
-            # regressionModel = GradientBoosterModel(datasetPath, find, columns, graphisPath)
-            # regressionModel = SvrModel(datasetPath, find, columns, graphisPath)
-            # regressionModel = DecisionTreeModel(datasetPath, find, columns, graphisPath)
+            if model_type == 'linear-regression-model':
+                regressionModel = LinearRegressionModel(datasetPath, find, columns, graphisPath, save_png=True)
+            elif model_type == 'random-forest-model':
+                regressionModel = RandomForestModel(datasetPath, find, columns, graphisPath, save_png=True)
+            elif model_type == 'gradient-booster-model':
+                regressionModel = GradientBoosterModel(datasetPath, find, columns, graphisPath, save_png=True)
+            elif model_type == 'svr-model':
+                regressionModel = SvrModel(datasetPath, find, columns, graphisPath, save_png=False)
+            elif model_type == 'decision-tree-model':
+                regressionModel = DecisionTreeModel(datasetPath, find, columns, graphisPath, save_png=True)
+            elif model_type == 'optimal':
+                regressionModel, model_type = choiceOptimalModel(datasetPath, find, columns, graphisPath)
+            else:
+                raise InvalidModelTypeError('Неверный тип модели')
+
+            userModelCfg.model_type = model_type
+            message = {
+                'text': f'Тип модели - {model_type}',
+                'time': datetime.now().strftime('%H:%M:%S'),
+                'color': '#33ff33'
+            }
+            messages[f'message{len(messages)}'] = message
+
 
 
             mse = regressionModel.mse

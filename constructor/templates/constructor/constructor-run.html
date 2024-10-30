@@ -39,6 +39,50 @@
     <section style="display: none" id="df-section">
         <h2>Датасет в формате csv</h2>
         <input type="file" name="dataset" id="dataset" class="form-control" accept="text/csv">
+        <hr>
+        <h3>Выберите модель обучения</h3>
+
+        <div class="model-choice" style="user-select: none;">
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="model-check" value="linear-regression-model">
+                    Linear Regression Model
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="model-check" value="random-forest-model">
+                    Random Forest Model
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="model-check" value="gradient-booster-model">
+                    Gradient Booster Model
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="model-check" value="svr-model">
+                    SVR Model
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="model-check" value="decision-tree-model">
+                    Decision Tree Model
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="form-check-label">
+                    <input type="radio" class="form-check-input" name="model-check" value="optimal">
+                    Выбрать автоматически (оптимально)
+                </label>
+            </div>
+        </div>
+
+        <hr>
+
         <div style="margin-top: 10px" class="btn-list">
             <input class="next btn btn-primary" type="button" value="Далее">
             <input class="prev btn btn-danger" type="button" value="Назад">

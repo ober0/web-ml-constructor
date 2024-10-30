@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let DATA = []
     let NAME = []
-
+    let MODEL_TYPE = []
     function hideAllSection(toOpen){
         sections.forEach(function (el) {
             el.style.display = 'none';
@@ -141,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     section3.querySelector('.next').addEventListener('click', function () {
         let fileLoad = section3.querySelector('#dataset').files[0]
+        MODEL_TYPE = document.querySelector('input[name="model-check"]:checked').value
         if (fileLoad){
             if (fileLoad.type === 'text/csv'){
                 hideAllSection(section4)
@@ -180,6 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             const modelId = data.modelId
                             let formData = new FormData()
                             formData.append('modelId', modelId)
+                            formData.append('model-type', MODEL_TYPE)
                             fetch('/constructor/model/create/', {
                                 method: 'POST',
                                 headers: {
