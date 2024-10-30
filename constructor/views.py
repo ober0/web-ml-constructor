@@ -7,7 +7,7 @@ from django.shortcuts import render
 from .models import UserModels, DataFields
 from django.db import IntegrityError
 import pandas as pd
-from .createMLModel import LinearRegreesionModel
+from .createMLModel import LinearRegressionModel, RandomForestModel, GradientBoosterModel, SvrModel, DecisionTreeModel
 import pickle
 
 
@@ -88,8 +88,8 @@ def checkModel(request):
             formatted_columns = {col: dtype for col, dtype in columns_with_types.items()}
 
 
-            # data = [{'name': 'Age', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Gender', 'datatype': 'object', 'predict': 'False'}, {'name': 'Weight (kg)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Height (m)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Max_BPM', 'datatype': 'int64', 'predict':
-# 'False'}, {'name': 'Avg_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Resting_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Session_Duration (hours)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Calories_Burned', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Type', 'datatype': 'object', 'predict': 'False'}, {'name': 'Fat_Percentage', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Water_Intake (liters)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Frequency (days/week)', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Experience_Level', 'datatype': 'int64', 'predict': 'False'}, {'name': 'BMI', 'datatype': 'float64', 'predict': 'True'}]
+            data = [{'name': 'Age', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Gender', 'datatype': 'object', 'predict': 'False'}, {'name': 'Weight (kg)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Height (m)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Max_BPM', 'datatype': 'int64', 'predict':
+'False'}, {'name': 'Avg_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Resting_BPM', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Session_Duration (hours)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Calories_Burned', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Type', 'datatype': 'object', 'predict': 'False'}, {'name': 'Fat_Percentage', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Water_Intake (liters)', 'datatype': 'float64', 'predict': 'False'}, {'name': 'Workout_Frequency (days/week)', 'datatype': 'int64', 'predict': 'False'}, {'name': 'Experience_Level', 'datatype': 'int64', 'predict': 'False'}, {'name': 'BMI', 'datatype': 'float64', 'predict': 'True'}]
 
 
             if len(data) == len(columns):
@@ -266,7 +266,14 @@ def createModel(request):
             return JsonResponse({'success': False, 'messages': messages})
         print(3)
         try:
-            regressionModel = LinearRegreesionModel(datasetPath, find, columns, graphisPath)
+            #Регрессии
+            # regressionModel = LinearRegressionModel(datasetPath, find, columns, graphisPath)
+            # regressionModel = RandomForestModel(datasetPath, find, columns, graphisPath)
+            # regressionModel = GradientBoosterModel(datasetPath, find, columns, graphisPath)
+            # regressionModel = SvrModel(datasetPath, find, columns, graphisPath)
+            # regressionModel = DecisionTreeModel(datasetPath, find, columns, graphisPath)
+
+
             mse = regressionModel.mse
             model = regressionModel.model
             userModelCfg.mse = mse
