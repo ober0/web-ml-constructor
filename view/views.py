@@ -1,4 +1,5 @@
 import requests
+from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.conf import settings
@@ -90,5 +91,27 @@ def request_predict(request, pk):
         predict = data['predict']
         return render(request, 'view/result.html', {'predict': predict})
 
+@staff_member_required
+def remove_model(request, pk):
+    model = UserModels.objects.get(id=pk)
+    fields = DataFields.objects.filter(modelId=pk).all()
+    for field in fields:
+        field.delete()
+    datasetPath = model.DatasetPath
+    graphisPath = model.GraphisPath
+    modelPath = model.ModelPath
+    lePath = model.LEPath
+
+    try:
+        os.remove(os.path.join(settings.DATASET_ROOT_DIR, datasetPath))
+        os.remove(os.path.join(settings.GRAPHICS_ROOT_DIR, graphisPath))
+        os.remove(os.path.join(settings.MODELS_ROOT_DIR, modelPath))
+        os.remove(os.path.join(settings.LE_ROOT_DIR, lePath))
+    except Exception as e:
+        return JsonResponse({'success':False, 'error': e})
+
+    model.delete()
+
+    return JsonResponse({'success': True})
 
 #http://127.0.0.1:8000/view/api/predict/model/1?Age=56&Gender=0&Weight%20(kg)=88.3&Height%20(m)=1.71&Max_BPM=180&Resting_BPM=157&Session_Duration%20(hours)=1.69&Calories_Burned=1313.0&Workout_Type=0&Fat_Percentage=12.6&Water_Intake%20(liters)=3.5&Workout_Frequency%20(days/week)=4&Experience_Level=3&Avg_BPM=120
